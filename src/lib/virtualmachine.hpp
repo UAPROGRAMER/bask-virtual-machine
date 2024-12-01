@@ -18,15 +18,15 @@ class VirtualMachine
     private:
 
     vector<uint8_t> bytecode;
-    std::stack<int64_t> stack;
-    uint64_t operationpoiter;
+    stack<int64_t> opstack;
+    uint64_t index;
     uint8_t byte;
 
     public:
 
     VirtualMachine(vector<uint8_t>& _bytecode):
         bytecode(_bytecode),
-        operationpoiter((uint64_t)-1),
+        index((uint64_t)-1),
         byte(0)
     {
         read();
@@ -34,7 +34,7 @@ class VirtualMachine
 
     void read()
     {
-        byte = bytecode.at(++operationpoiter);
+        byte = bytecode.at(++index);
     }
 
     int run()
@@ -46,12 +46,12 @@ class VirtualMachine
                 return exit();
             }
 
-            operation();
+            instruction();
             read();
         }
     }
 
-    void operation()
+    void instruction()
     {
         switch (byte)
         {
@@ -76,52 +76,41 @@ class VirtualMachine
     void push()
     {
         int64_t value = 0;
-        read();
-        value |= (((int64_t)byte));
-        read();
-        value |= (((int64_t)byte)<<8);
-        read();
-        value |= (((int64_t)byte)<<16);
-        read();
-        value |= (((int64_t)byte)<<24);
-        read();
-        value |= (((int64_t)byte)<<32);
-        read(); 
-        value |= (((int64_t)byte)<<40);
-        read();
-        value |= (((int64_t)byte)<<48);
-        read();
-        value |= (((int64_t)byte)<<56);
-        stack.push(value);
+        for (uint8_t i = 0; i < 64; i+=8)
+        {
+            read();
+            value |= ((int64_t)byte<<i);
+        }
+        opstack.push(value);
     }
 
     void pop()
     {
-        stack.pop();
+        opstack.pop();
     }
 
     void add()
     {
-        int64_t value = stack.top(); stack.pop();
-        value += stack.top(); stack.pop();
-        stack.push(value);
+        int64_t value = opstack.top(); opstack.pop();
+        value += opstack.top(); opstack.pop();
+        opstack.push(value);
     }
 
     void sub()
     {
-        int64_t value = stack.top(); stack.pop();
-        value = stack.top() - value; stack.pop();
-        stack.push(value);
+        int64_t value = opstack.top(); opstack.pop();
+        value = opstack.top() - value; opstack.pop();
+        opstack.push(value);
     }
 
     void print()
     {
-        std::cout << stack.top();
+        std::cout << opstack.top();
     }
 
     int exit()
     {
-        return stack.top();
+        return opstack.top();
     }
 };
 

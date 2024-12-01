@@ -8,11 +8,14 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <unordered_map>
 
 using std::string;
 using std::vector;
 using std::stringstream;
 using std::fstream;
 using std::unique_ptr;
+using std::stack;
+using std::unordered_map;
 
 #endif
