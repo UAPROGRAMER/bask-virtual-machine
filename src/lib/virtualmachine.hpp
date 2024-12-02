@@ -10,7 +10,9 @@ typedef enum : uint8_t
     OC_ADD,
     OC_SUB,
     OC_EXIT,
-    OC_PRINT
+    OC_PRINT,
+    OC_SETVAR,
+    OC_GETVAR
 } OperationCode;
 
 class VirtualMachine
@@ -21,6 +23,7 @@ class VirtualMachine
     stack<int64_t> opstack;
     uint64_t index;
     uint8_t byte;
+    unordered_map<uint64_t, int64_t> global;
 
     public:
 
@@ -70,6 +73,12 @@ class VirtualMachine
             case OC_PRINT:
                 print();
                 break;
+            case OC_SETVAR:
+                setvar();
+                break;
+            case OC_GETVAR:
+                getvar();
+                break;
         }
     }
 
@@ -106,6 +115,18 @@ class VirtualMachine
     void print()
     {
         std::cout << opstack.top();
+    }
+
+    void setvar()
+    {
+        uint64_t var = opstack.top(); opstack.pop();
+        global[var] = opstack.top(); opstack.pop();
+    }
+
+    void getvar()
+    {
+        uint64_t var = opstack.top(); opstack.pop();
+        opstack.push(global[var]);
     }
 
     int exit()

@@ -4,3 +4,5 @@ OC_ADD equ 2
 OC_SUB equ 3
 OC_EXIT equ 4
 OC_PRINT equ 5
+OC_SETVAR equ 6
+OC_GETVAR equ 7
